@@ -32,6 +32,11 @@ class Blog
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $SubImages = null;
 
+    public function __construct()
+    {
+        $this->PublicationDate = new \DateTime();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
