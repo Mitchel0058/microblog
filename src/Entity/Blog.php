@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\BlogRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: BlogRepository::class)]
 class Blog
@@ -15,21 +16,29 @@ class Blog
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
     private ?string $Title = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
     private ?string $Subtitle = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Assert\NotBlank]
     private ?\DateTimeInterface $PublicationDate = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank]
     private ?string $Text = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
+    #[Assert\Image]
     private ?string $MainImage = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\NotBlank]
+    #[Assert\Image]
     private ?string $SubImages = null;
 
     public function __construct()
