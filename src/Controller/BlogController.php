@@ -13,10 +13,12 @@ use Symfony\Component\HttpFoundation\Request;
 class BlogController extends AbstractController
 {
     #[Route('/', name: 'homepage')]
-    public function indexAction(): Response
+    public function indexAction(EntityManagerInterface $entityManager): Response
     {
+        $blogs = $entityManager->getRepository(Blog::class)->findAll();
+
         return $this->render('blog/index.html.twig', [
-            'controller_name' => 'BlogController',
+            'blogs' => $blogs,
         ]);
     }
 
@@ -38,5 +40,29 @@ class BlogController extends AbstractController
         return $this->render('blog/create.html.twig', [
             'blog_form' => $form->createView(),
         ]);
+    }
+
+    #[Route('/blog/{id<\d+>}/edit', name: 'editBlog')]
+    public function edit(Request $request, EntityManagerInterface $entityManager): Response
+    {
+
+
+        return new response('To add edit');
+    }
+
+    #[Route('/blog/{id<\d+>/delete}', name: 'deleteBlog')]
+    public function delete(Request $request, EntityManagerInterface $entityManager): Response
+    {
+
+
+        return new response('To add delete');
+    }
+
+    #[Route('/blog/{id<\d+>}', name: 'showBlog')]
+    public function show(Request $request, EntityManagerInterface $entityManager): Response
+    {
+
+
+        return new response('To add show');
     }
 }
