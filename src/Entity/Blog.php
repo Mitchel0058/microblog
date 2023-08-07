@@ -37,7 +37,6 @@ class Blog
     private ?string $MainImage = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Assert\NotBlank]
     #[Assert\Image]
     private ?string $SubImages = null;
 
