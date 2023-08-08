@@ -10,6 +10,7 @@ use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\All;
 
 class BlogFormType extends AbstractType
 {
@@ -28,7 +29,19 @@ class BlogFormType extends AbstractType
                     'mimeTypesMessage' => 'Please upload a valid image',
                 ])
             ]])
-            ->add('SubImages', FileType::class, ['mapped' => false, 'required' => false])
+            ->add('SubImages', FileType::class, ['mapped' => false, 'multiple' => true, 'required' => false, 'constraints' => [
+                new All([
+                    'constraints' => [
+                        new File([
+                            'maxSize' => '1024k',
+                            'mimeTypes' => [
+                                'image/*'
+                            ],
+                            'mimeTypesMessage' => 'Please upload a valid image',
+                        ])
+                    ]
+                ])
+            ]])
             ->add('Submit', SubmitType::class);
     }
 

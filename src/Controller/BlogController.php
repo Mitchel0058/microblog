@@ -36,6 +36,7 @@ class BlogController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
 
             $mainImageFile = $form->get('MainImage')->getData();
+            $subImageFiles = $form->get('SubImages')->getData();
 
             if ($mainImageFile) {
                 $originalFilename = pathinfo($mainImageFile->getClientOriginalName(), PATHINFO_FILENAME);
@@ -54,11 +55,28 @@ class BlogController extends AbstractController
                     var_dump($e);
                 }
 
-                // updates the 'brochureFilename' property to store the PDF file name
+                // updates the 'mainImageFileName' property to store the PDF file name
                 // instead of its contents
                 $blog->setMainImage($newFilename);
             }
 
+            foreach ($subImageFiles as $subImageFile) {
+                if ($subImageFile) {
+                    $originalFilename = pathinfo($subImageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                    $safeFilename = $slugger->slug($originalFilename);
+                    $newFilename = $safeFilename . '-' . uniqid() . '.' . $subImageFile->guessExtension();
+
+                    try {
+                        $subImageFile->move(
+                            $this->getParameter('subImages_directory'),
+                            $newFilename
+                        );
+                    } catch (FileException $e) {
+                        var_dump($e);
+                    }
+                    $blog->addSubImages($newFilename);
+                }
+            }
 
             $entityManager->persist($blog);
             $entityManager->flush();
@@ -74,7 +92,6 @@ class BlogController extends AbstractController
     public function edit(Request $request, EntityManagerInterface $entityManager): Response
     {
 
-
         return new response('To add edit');
     }
 
@@ -82,14 +99,12 @@ class BlogController extends AbstractController
     public function delete(Request $request, EntityManagerInterface $entityManager): Response
     {
 
-
         return new response('To add delete');
     }
 
     #[Route('/blog/{id<\d+>}', name: 'showBlog')]
     public function show(Request $request, EntityManagerInterface $entityManager): Response
     {
-
 
         return new response('To add show');
     }

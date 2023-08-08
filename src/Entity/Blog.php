@@ -35,9 +35,9 @@ class Blog
     #[Assert\Image]
     private ?string $MainImage = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(type: Types::ARRAY, nullable: true)]
     #[Assert\Image]
-    private ?string $SubImages = null;
+    private $SubImages = null;
 
     public function __construct()
     {
@@ -109,14 +109,21 @@ class Blog
         return $this;
     }
 
-    public function getSubImages(): ?string
+    public function getSubImages(): ?array
     {
         return $this->SubImages;
     }
 
-    public function setSubImages(?string $SubImages): static
+    public function setSubImages(?array $SubImages): static
     {
         $this->SubImages = $SubImages;
+
+        return $this;
+    }
+
+    public function addSubImages(?string $SubImages): static
+    {
+        $this->SubImages[] = $SubImages;
 
         return $this;
     }
