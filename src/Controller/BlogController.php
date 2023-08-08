@@ -17,7 +17,7 @@ class BlogController extends AbstractController
     #[Route('/', name: 'homepage')]
     public function indexAction(EntityManagerInterface $entityManager): Response
     {
-        $blogs = $entityManager->getRepository(Blog::class)->findAll();
+        $blogs = $entityManager->getRepository(Blog::class)->findBy([], ['id' => 'DESC']);
 
         return $this->render('blog/index.html.twig', [
             'blogs' => $blogs,
@@ -103,9 +103,10 @@ class BlogController extends AbstractController
     }
 
     #[Route('/blog/{id<\d+>}', name: 'showBlog')]
-    public function show(Request $request, EntityManagerInterface $entityManager): Response
+    public function show(Request $request, EntityManagerInterface $entityManager, $id): Response
     {
+        $blog = $entityManager->getRepository(Blog::class)->findById($id);
 
-        return new response('To add show');
+        return $this->render('blog/show.html.twig', ['blog'=> $blog[0]]);
     }
 }
