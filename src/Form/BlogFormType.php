@@ -6,6 +6,7 @@ use App\Entity\Blog;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -18,8 +19,16 @@ class BlogFormType extends AbstractType
             ->add('Title')
             ->add('Subtitle')
             ->add('Text')
-            ->add('MainImage', FileType::class)
-            ->add('SubImages', FileType::class, ['required' => false])
+            ->add('MainImage', FileType::class, ['mapped' => false, 'constraints' => [
+                new File([
+                    'maxSize' => '1024k',
+                    'mimeTypes' => [
+                        'image/*'
+                    ],
+                    'mimeTypesMessage' => 'Please upload a valid image',
+                ])
+            ]])
+            ->add('SubImages', FileType::class, ['mapped' => false, 'required' => false])
             ->add('Submit', SubmitType::class);
     }
 

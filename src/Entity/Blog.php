@@ -32,7 +32,6 @@ class Blog
     private ?string $Text = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank]
     #[Assert\Image]
     private ?string $MainImage = null;
 

@@ -18,19 +18,18 @@
 	</style>
 
 	<div class="example-wrapper">
-		<h1>Welcome to my blogs</h1>
+		<h1>Welcome to my blogs
+			<a href={{path('createBlog')}} class="btn btn-success float-end">Add new</a>
+		</h1>
 		{% for blog in blogs %}
 			<div class="card">
 				<div class="card-body">
-					<a
-						href={{ path('showBlog', {id:blog.id} ) }} class="text-decoration-none text-reset">
-						{# <a href={{ path('showBlog', {id:blog.id} ) }}> #}
+					<a href={{ path('showBlog', {id:blog.id} ) }} class="text-decoration-none text-reset">
 						<h2>{{ blog.title }}</h2>
 						<h3>{{ blog.subtitle }}</h3>
 						<h6 class="text-muted">{{ blog.publicationDate|date("d/m/Y") }}</h6>
-						<img src={{blog.mainImage}}/>
+						<img src='uploads/mainImage/{{blog.mainImage}}' class="img-fluid" />
 						<p>{{ blog.text|length > 50 ? blog.text|slice(0, 50) ~ '...' : blog.text }}</p>
-						{# </a> #}
 						<a href={{ path('deleteBlog', {id: blog.id} ) }} class="btn btn-danger float-end m-1">Delete</a>
 						<a href={{ path('editBlog', {id: blog.id} ) }} class="btn btn-info float-end m-1">Edit</a>
 					</a>

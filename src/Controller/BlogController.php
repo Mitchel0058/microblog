@@ -9,6 +9,8 @@ use App\Entity\Blog;
 use App\Form\BlogFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class BlogController extends AbstractController
 {
@@ -23,7 +25,7 @@ class BlogController extends AbstractController
     }
 
     #[Route('/create', name: 'createBlog')]
-    public function create(Request $request, EntityManagerInterface $entityManager): Response
+    public function create(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
         $blog = new Blog();
 
@@ -32,6 +34,32 @@ class BlogController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            $mainImageFile = $form->get('MainImage')->getData();
+
+            if ($mainImageFile) {
+                $originalFilename = pathinfo($mainImageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                // this is needed to safely include the file name as part of the URL
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $mainImageFile->guessExtension();
+
+                // Move the file to the directory where brochures are stored
+                try {
+                    $mainImageFile->move(
+                        $this->getParameter('mainImage_directory'),
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    // ... handle exception if something    happens during file upload
+                    var_dump($e);
+                }
+
+                // updates the 'brochureFilename' property to store the PDF file name
+                // instead of its contents
+                $blog->setMainImage($newFilename);
+            }
+
+
             $entityManager->persist($blog);
             $entityManager->flush();
             return new response('Successfully created id ' . $blog->getId());
