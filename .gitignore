@@ -65,7 +65,6 @@ public/uploads/*
 # End of https://www.toptal.com/developers/gitignore/api/symfony
 
 ###> symfony/framework-bundle ###
-/.env
 /.env.local
 /.env.local.php
 /.env.*.local
