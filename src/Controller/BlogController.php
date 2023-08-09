@@ -149,11 +149,16 @@ class BlogController extends AbstractController
         ]);
     }
 
-    #[Route('/blog/{id<\d+>/delete}', name: 'deleteBlog')]
-    public function delete(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/blog/{id<\d+>}/delete', name: 'deleteBlog')]
+    public function delete(Request $request, EntityManagerInterface $entityManager, $id): Response
     {
+        $this->get('session')->getFlashBag()->add('Confirm', 'Confirm deletion?');
 
-        return new response('To add delete');
+        $blog = $entityManager->getRepository(Blog::class)->findById($id);
+        $entityManager->remove($blog[0]);
+        $entityManager->flush();
+
+        return $this->redirectToRoute('homepage');
     }
 
     #[Route('/blog/{id<\d+>}', name: 'showBlog')]

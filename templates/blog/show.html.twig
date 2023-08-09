@@ -20,7 +20,9 @@
 
 	<div class="example-wrapper">
 		<h1>{{blog.title}}
-			<a href={{ path('homepage') }} class="btn btn-info float-end">Back</a>
+			<a href={{ path('homepage') }} class="btn btn-success float-end">Back</a>
+			<a href={{ path('editBlog', {id: blog.id} ) }} class="btn btn-info float-end me-1">Edit</a>
+			<a href={{ path('deleteBlog', {id: blog.id} ) }} onclick="return confirm('Confirm deletion')" class="btn btn-danger float-end me-1">Delete</a>
 		</h1>
 		<img src='../uploads/mainImage/{{blog.mainImage}}' class="img-fluid" width="100%">
 		<h2>{{blog.subtitle}}</h2>
