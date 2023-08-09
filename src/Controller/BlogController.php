@@ -11,6 +11,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
+use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Filesystem\Path;
 
 class BlogController extends AbstractController
 {
@@ -152,7 +155,15 @@ class BlogController extends AbstractController
     #[Route('/blog/{id<\d+>}/delete', name: 'deleteBlog')]
     public function delete(Request $request, EntityManagerInterface $entityManager, $id): Response
     {
+        $filesystem = new Filesystem();
         $blog = $entityManager->getRepository(Blog::class)->findById($id);
+
+        $filesystem->remove('./uploads/mainImage/' . $blog[0]->getMainImage());
+
+        foreach ($blog[0]->getSubImages() as $subImage) {
+            $filesystem->remove('./uploads/subImage/' . $subImage);
+        }
+
         $entityManager->remove($blog[0]);
         $entityManager->flush();
 
