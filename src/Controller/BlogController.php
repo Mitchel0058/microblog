@@ -80,7 +80,7 @@ class BlogController extends AbstractController
 
             $entityManager->persist($blog);
             $entityManager->flush();
-            return new response('Successfully created id ' . $blog->getId());
+            return $this->redirectToRoute('homepage');
         }
 
         return $this->render('blog/create.html.twig', [
@@ -89,10 +89,64 @@ class BlogController extends AbstractController
     }
 
     #[Route('/blog/{id<\d+>}/edit', name: 'editBlog')]
-    public function edit(Request $request, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, EntityManagerInterface $entityManager, Blog $blog, SluggerInterface $slugger): Response
     {
+        $form = $this->createForm(BlogFormType::class, $blog);
 
-        return new response('To add edit');
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $mainImageFile = $form->get('MainImage')->getData();
+            $subImageFiles = $form->get('SubImages')->getData();
+
+            if ($mainImageFile) {
+                $originalFilename = pathinfo($mainImageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                // this is needed to safely include the file name as part of the URL
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $mainImageFile->guessExtension();
+
+                // Move the file to the directory where brochures are stored
+                try {
+                    $mainImageFile->move(
+                        $this->getParameter('mainImage_directory'),
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    // ... handle exception if something    happens during file upload
+                    var_dump($e);
+                }
+
+                // updates the 'mainImageFileName' property to store the PDF file name
+                // instead of its contents
+                $blog->setMainImage($newFilename);
+            }
+
+            foreach ($subImageFiles as $subImageFile) {
+                if ($subImageFile) {
+                    $originalFilename = pathinfo($subImageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                    $safeFilename = $slugger->slug($originalFilename);
+                    $newFilename = $safeFilename . '-' . uniqid() . '.' . $subImageFile->guessExtension();
+
+                    try {
+                        $subImageFile->move(
+                            $this->getParameter('subImages_directory'),
+                            $newFilename
+                        );
+                    } catch (FileException $e) {
+                        var_dump($e);
+                    }
+                    $blog->addSubImages($newFilename);
+                }
+            }
+
+            $entityManager->persist($blog);
+            $entityManager->flush();
+            return $this->redirect('homepage');
+        }
+        return $this->render('blog/edit.html.twig', [
+            'blog_form' => $form->createView()
+        ]);
     }
 
     #[Route('/blog/{id<\d+>/delete}', name: 'deleteBlog')]
@@ -107,6 +161,6 @@ class BlogController extends AbstractController
     {
         $blog = $entityManager->getRepository(Blog::class)->findById($id);
 
-        return $this->render('blog/show.html.twig', ['blog'=> $blog[0]]);
+        return $this->render('blog/show.html.twig', ['blog' => $blog[0]]);
     }
 }
