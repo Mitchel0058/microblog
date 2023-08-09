@@ -32,11 +32,11 @@ class Blog
     private ?string $Text = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\Image]
+    #[Assert\Image(groups: ['create'])]
     private ?string $MainImage = null;
 
     #[ORM\Column(type: Types::ARRAY, nullable: true)]
-    #[Assert\Image]
+    #[Assert\Image(groups: ['create'])]
     private $SubImages = null;
 
     public function __construct()

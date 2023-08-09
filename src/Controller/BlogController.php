@@ -142,7 +142,7 @@ class BlogController extends AbstractController
 
             $entityManager->persist($blog);
             $entityManager->flush();
-            return $this->redirect('homepage');
+            return $this->redirectToRoute('homepage');
         }
         return $this->render('blog/edit.html.twig', [
             'blog_form' => $form->createView()
@@ -152,8 +152,6 @@ class BlogController extends AbstractController
     #[Route('/blog/{id<\d+>}/delete', name: 'deleteBlog')]
     public function delete(Request $request, EntityManagerInterface $entityManager, $id): Response
     {
-        $this->get('session')->getFlashBag()->add('Confirm', 'Confirm deletion?');
-
         $blog = $entityManager->getRepository(Blog::class)->findById($id);
         $entityManager->remove($blog[0]);
         $entityManager->flush();
